@@ -90,6 +90,34 @@ instacart %>%
 
 ## Problem 2
 
+Load, tidy, and otherwise wrangle the data.
+
+```{r accel_df, message = FALSE}
+accel_df = 
+	read_csv("./data/accel_data.csv") %>% 
+	janitor::clean_names() %>% 
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "minute_raw",
+    values_to = "activity_counts"
+  ) %>% 
+  separate(minute_raw, into = c("raw", "minute"), convert = TRUE) %>% 
+	mutate(
+	  week = as.integer(week),
+	  day_id = as.integer(day_id),
+	  day = as.factor(day),
+    weekday = case_when(
+      day %in% c("Monday","Tuesday","Wednesday","Thursday","Friday") ~ "weekday",
+      day %in% c("Saturday","Sunday") ~ "weekend",
+      TRUE ~ ""
+    ),
+	  weekday = as.factor(weekday)
+	) %>% 
+	select(week:day, weekday, minute, activity_counts) %>% 
+  view()
+```
+
+The resulting dataset `accel_df` contains the following `r ncol(accel_df)` variables: `r names(accel_df)`. It has `r nrow(accel_df)` observations, and the dimension is `r nrow(accel_df)` x `r ncol(accel_df)`.
 
 
 ## Problem 3
