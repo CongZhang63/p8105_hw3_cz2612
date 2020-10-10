@@ -106,9 +106,10 @@ accel_df =
 	  week = as.integer(week),
 	  day_id = as.integer(day_id),
 	  day = as.factor(day),
+	  day = ordered(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
     weekday = case_when(
-      day %in% c("Monday","Tuesday","Wednesday","Thursday","Friday") ~ "weekday",
-      day %in% c("Saturday","Sunday") ~ "weekend",
+      day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~ "weekday",
+      day %in% c("Saturday", "Sunday") ~ "weekend",
       TRUE ~ ""
     ),
 	  weekday = as.factor(weekday)
@@ -119,7 +120,7 @@ accel_df =
 The resulting dataset `accel_df` contains the following `r ncol(accel_df)` variables: `r names(accel_df)`. It has `r nrow(accel_df)` observations, and the dimension is `r nrow(accel_df)` x `r ncol(accel_df)`.
 
 
-Create daily total activity and corresponding table.
+Create daily total activity variable and corresponding table.
 
 ```{r total_activity}
 accel_df %>% 
@@ -128,8 +129,32 @@ accel_df %>%
   knitr::kable(digits = 2)
 ```
 
-From the table, I couldn't see any apparent trends regarding the total activity for each day.
+From the table, we could see that the activities on Tuesdays and Wednesdays are more stable than other days.
 
+
+Make a single-panel plot.
+
+```{r activity_plot}
+ggp_activity_plot = 
+  accel_df %>% 
+  ggplot(aes(x = minute, y = activity_counts, color = day)) + 
+  geom_line(alpha = .5) + 
+  geom_smooth(se = FALSE) + 
+  labs(
+    title = "Activity counts plot",
+    x = "Minute of the day",
+    y = "Activity counts",
+    caption = "Data from the accel_data.csv file"
+  ) + 
+  viridis::scale_color_viridis(
+    name = "Day", 
+    discrete = TRUE
+  )
+
+ggp_activity_plot
+```
+
+From this graph, we could see that the activity counts of night are normally larger than the activity counts of the daytime, and the activity counts of midnight are the lowest of all day. Generally speaking, Friday night and Sunday morning seem to have higher activity counts than other time.
 
 
 ## Problem 3
