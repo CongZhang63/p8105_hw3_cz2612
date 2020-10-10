@@ -159,4 +159,12 @@ From this graph, we could see that the activity counts of night are normally lar
 
 ## Problem 3
 
+Load and describe the data.
+
+```{r}
+data("ny_noaa")
+```
+
+The dataset `ny_noaa` contains the following `r ncol(ny_noaa)` variables: `r names(ny_noaa)`. It has `r nrow(ny_noaa)` observations, and the dimension is `r nrow(ny_noaa)` x `r ncol(ny_noaa)`. This dataset has many missing values. prcp has `r sum(is.na(pull(ny_noaa, prcp)))` missing values.  snow has `r sum(is.na(pull(ny_noaa, snow)))` missing values.  snwd has `r sum(is.na(pull(ny_noaa, snwd)))` missing values.  tmax has `r sum(is.na(pull(ny_noaa, tmax)))` missing values.  tmin has `r sum(is.na(pull(ny_noaa, tmin)))` missing values. 
+
 
