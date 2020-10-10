@@ -113,11 +113,23 @@ accel_df =
     ),
 	  weekday = as.factor(weekday)
 	) %>% 
-	select(week:day, weekday, minute, activity_counts) %>% 
-  view()
+	select(week:day, weekday, minute, activity_counts)
 ```
 
 The resulting dataset `accel_df` contains the following `r ncol(accel_df)` variables: `r names(accel_df)`. It has `r nrow(accel_df)` observations, and the dimension is `r nrow(accel_df)` x `r ncol(accel_df)`.
+
+
+Create daily total activity and corresponding table.
+
+```{r total_activity}
+accel_df %>% 
+  group_by(week, day) %>%
+  summarize(total_activity = sum(activity_counts)) %>% 
+  knitr::kable(digits = 2)
+```
+
+From the table, I couldn't see any apparent trends regarding the total activity for each day.
+
 
 
 ## Problem 3
