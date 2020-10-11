@@ -168,3 +168,31 @@ data("ny_noaa")
 The dataset `ny_noaa` contains the following `r ncol(ny_noaa)` variables: `r names(ny_noaa)`. It has `r nrow(ny_noaa)` observations, and the dimension is `r nrow(ny_noaa)` x `r ncol(ny_noaa)`. This dataset has many missing values. prcp has `r sum(is.na(pull(ny_noaa, prcp)))` missing values.  snow has `r sum(is.na(pull(ny_noaa, snow)))` missing values.  snwd has `r sum(is.na(pull(ny_noaa, snwd)))` missing values.  tmax has `r sum(is.na(pull(ny_noaa, tmax)))` missing values.  tmin has `r sum(is.na(pull(ny_noaa, tmin)))` missing values. 
 
 
+Clean the NY NOAA data.
+
+```{r ny_noaa}
+ny_noaa = 
+	ny_noaa %>% 
+	janitor::clean_names() %>% 
+  separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
+	mutate(
+	  tmax = as.numeric(tmax),
+	  tmin = as.numeric(tmin),
+	  prcp = prcp / 10,
+	  tmax = tmax / 10,
+	  tmin = tmin / 10,
+  )
+```
+
+```{r snow_freq_df}
+snow_freq_df =
+  ny_noaa %>%
+  group_by(snow) %>%
+  summarize(snow_freq = n()) %>% 
+  arrange(desc(snow_freq)) %>% 
+  head(n = 1)
+```
+
+For snowfall, the most commonly observed values are `r max(pull(snow_freq_df, snow))`, because there are `r max(pull(snow_freq_df, snow_freq))` observations have a snow value of `r max(pull(snow_freq_df, snow))`, which are the most frequent.
+
+
