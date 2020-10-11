@@ -159,7 +159,7 @@ From this graph, we could see that the activity counts of night are normally lar
 
 ## Problem 3
 
-Load and describe the data.
+Load and describe the NY NOAA data.
 
 ```{r}
 data("ny_noaa")
@@ -176,6 +176,7 @@ ny_noaa =
 	janitor::clean_names() %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
 	mutate(
+	  id = as.factor(id),
 	  tmax = as.numeric(tmax),
 	  tmin = as.numeric(tmin),
 	  prcp = prcp / 10,
@@ -196,3 +197,37 @@ snow_freq_df =
 For snowfall, the most commonly observed values are `r max(pull(snow_freq_df, snow))`, because there are `r max(pull(snow_freq_df, snow_freq))` observations have a snow value of `r max(pull(snow_freq_df, snow))`, which are the most frequent.
 
 
+Make a two-panel plot showing the average max temperature in January and in July in each station across years.
+
+```{r mean_tmax_plot}
+ny_noaa %>% 
+  group_by(id, year, month) %>% 
+  summarise(mean_tmax = mean(tmax, na.rm = TRUE)) %>% 
+  filter(month %in% c(1,7)) %>% 
+  ggplot(aes(x = year, y = mean_tmax, group = id)) + 
+    geom_point(alpha = 0.1) + 
+    geom_path(aes(alpha = 0.5, fill = id)) + 
+    geom_smooth(se = FALSE) + 
+    facet_grid(~ month) + 
+    labs(title = "The average max temperature in January and July in each station across years", x = "Year", y = "Average maximum temperature (C)") 
+```
+
+
+Make two plots. 
+
+```{r two_plots}
+tmax_tmin_plot = 
+  ny_noaa %>% 
+  ggplot(aes(x = tmax, y = tmin)) + 
+    geom_hex() + 
+    labs(title = "Tmax vs Tmin")
+
+snowfall_plot = 
+  ny_noaa %>% 
+  filter(snow > 0 & snow < 100) %>% 
+  ggplot(aes(x = year, y = snow, group = year)) + 
+  geom_boxplot() + 
+  labs(title = "Snowfall Plot")
+
+tmax_tmin_plot + snowfall_plot
+```
