@@ -9,6 +9,7 @@ This is my solution to Homework 3.
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(patchwork)
 library(p8105.datasets)
 knitr::opts_chunk$set(
 	fig.width = 6, 
@@ -161,7 +162,7 @@ From this graph, we could see that the activity counts of night are normally lar
 
 Load and describe the NY NOAA data.
 
-```{r}
+```{r load_ny_noaa}
 data("ny_noaa")
 ```
 
@@ -204,13 +205,25 @@ ny_noaa %>%
   group_by(id, year, month) %>% 
   summarise(mean_tmax = mean(tmax, na.rm = TRUE)) %>% 
   filter(month %in% c(1,7)) %>% 
-  ggplot(aes(x = year, y = mean_tmax, group = id)) + 
-    geom_point(alpha = 0.1) + 
-    geom_path(aes(alpha = 0.5, fill = id)) + 
+	mutate(month = month.name[month]) %>%   
+  ggplot(aes(x = year, y = mean_tmax)) + 
+    geom_point(alpha = .1) + 
+    geom_path(aes(group = id), alpha = .2) + 
     geom_smooth(se = FALSE) + 
-    facet_grid(~ month) + 
-    labs(title = "The average max temperature in January and July in each station across years", x = "Year", y = "Average maximum temperature (C)") 
+    facet_grid(. ~ month) + 
+    labs(
+      title = "Average max temperature in January and July", 
+      x = "Year", 
+      y = "Average max temperature (C)",
+      caption = "Data from the NOAA National Climatic Data Center"
+    ) + 
+    scale_x_continuous(
+      limits = c(1980, 2010),
+      n.breaks = 10
+    )
 ```
+
+Across these years, the average max temperatures in July are much higher than those in January. The average max temperatures in July are more stable, while the average max temperatures in January have relatively bigger fluctuations. There are also many outliers. The most obvious outliers in January are in 1982, 1993, 1999, 2000, 2004, 2005, and 2008.  The most obvious outliers in July are in 1981, 1982, 1983, 1984, 1988, 1989, 2004, and 2007. From the graphs, we could not see any trend of global warming across these years.
 
 
 Make two plots. 
@@ -220,14 +233,27 @@ tmax_tmin_plot =
   ny_noaa %>% 
   ggplot(aes(x = tmax, y = tmin)) + 
     geom_hex() + 
-    labs(title = "Tmax vs Tmin")
+    labs(
+      title = "Max temperature vs Min temperature",
+      x = "Max temperature (C)",
+      y = "Min temperature (C)",
+      caption = "Data from the NOAA National Climatic Data Center"
+    ) + 
+    theme(legend.position = "right")
 
 snowfall_plot = 
   ny_noaa %>% 
   filter(snow > 0 & snow < 100) %>% 
   ggplot(aes(x = year, y = snow, group = year)) + 
   geom_boxplot() + 
-  labs(title = "Snowfall Plot")
+  labs(
+    title = "Snowfall distribution",
+    x = "Year",
+    y = "Snowfall (mm)",
+    caption = "Data from the NOAA National Climatic Data Center"
+  )
 
 tmax_tmin_plot + snowfall_plot
 ```
+
+From the graphs, we could see that there may be a linear correlation between the max temperature and min temperature, and the snowfall values tend to have similar distributions across the years, with year 1998, 2006, 2010 being somewhat different.
